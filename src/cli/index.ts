@@ -547,13 +547,13 @@ async function main() {
         await testPrinter();
         break;
       case '4':
-        await installService();
+        await checkStatus();
         break;
       case '5':
-        await uninstallService();
+        await installService();
         break;
       case '6':
-        await checkStatus();
+        await uninstallService();
         break;
       case '7':
         await startAgent();
