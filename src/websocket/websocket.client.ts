@@ -100,7 +100,7 @@ export class PcAgentClient {
           reason,
           tenantId: this.tenantId,
         });
-        stateService.setStatus('disconnected');
+        stateService.setStatus('stopped');
 
         // Attempt to reconnect if not manually disconnected
         if (reason !== 'io client disconnect') {
@@ -171,13 +171,13 @@ export class PcAgentClient {
       const targetPrinterPort = parseInt(process.env.PRINTER_PORT || String(DEFAULT_CONFIG.PRINTER_PORT), 10);
 
       // Record print job attempt
-      stateService.recordPrintJob();
+      stateService.recordPrintJob(true);
 
       // Print using connection pool
       await printToPrinter(targetPrinterIp, targetPrinterPort, printData);
 
       // Record successful print
-      stateService.recordPrintJobSuccess();
+      stateService.recordPrintJob(true); 
 
       // Send success response
       this.socket?.emit('pc-agent:print-result', {
@@ -193,7 +193,7 @@ export class PcAgentClient {
       });
     } catch (error) {
       // Record failed print
-      stateService.recordPrintJobFailure();
+      stateService.recordPrintJob(false);
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error('Print job failed', {
