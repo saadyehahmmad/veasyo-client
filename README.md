@@ -60,6 +60,8 @@ LAN Printer (ESC/POS) - Private IP: 192.168.x.x
 - Node.js 18+ installed ([Download Node.js](https://nodejs.org/))
 - Windows 10+ (for service installation)
 - Network access to your printer
+- Backend server URL (where Waiter backend is running)
+- Tenant ID from Waiter Admin Panel
 
 ### Setup
 
@@ -75,7 +77,15 @@ npm run cli
 
 3. **Select option 1** for complete setup
 
-The CLI will:
+The CLI will ask you for:
+- **Backend URL**: Where your Waiter backend server is running
+  - Local development: `http://localhost:3000`
+  - Production: `http://your-server-ip:3000` or `https://your-domain.com`
+- **Tenant ID**: Your restaurant's unique identifier (UUID from Admin Panel)
+- **Printer IP**: Your thermal printer's IP address (e.g., `192.168.1.100`)
+- **Printer Port**: Usually `9100` for network printers
+
+The CLI will then:
 - Check prerequisites
 - Guide you through configuration
 - Install dependencies
@@ -248,6 +258,75 @@ npm run cli  # Select option 4
 - Wrong BACKEND_URL → Check backend URL is correct and accessible
 - Wrong TENANT_ID → Verify tenant ID matches your restaurant subdomain
 - Network issues → Check internet connection and firewall settings
+
+## Troubleshooting
+
+### Error: "ECONNREFUSED" when connecting to backend
+
+**Symptoms:**
+```
+Error: websocket error
+ECONNREFUSED ::1:3000 or 127.0.0.1:3000
+```
+
+**Causes and Solutions:**
+
+1. **Backend server is not running**
+   - Check if backend is running: `curl http://localhost:3000/health`
+   - Start the backend server first before starting PC Agent
+
+2. **Wrong BACKEND_URL configuration**
+   - **Problem:** Using `http://localhost:3000` when backend is on a different server
+   - **Solution:** Update `.env` with correct backend URL:
+     ```env
+     # If backend is on remote server:
+     BACKEND_URL=http://194.195.87.213:3000
+     
+     # OR if using domain:
+     BACKEND_URL=https://your-backend-domain.com
+     ```
+
+3. **Firewall blocking connection**
+   - Check Windows Firewall
+   - Ensure port 3000 is accessible
+   - Test connection: `telnet backend-ip 3000`
+
+### Error: "TENANT_ID is required"
+
+Run the setup wizard to configure:
+```bash
+npm run cli
+# Select option 1: Setup Wizard
+```
+
+### Error: "Printer connection failed"
+
+1. Check printer is powered on
+2. Verify printer IP address is correct
+3. Ensure PC and printer are on same network
+4. Test printer connection from CLI:
+   ```bash
+   npm run cli
+   # Select option 3: Test Printer Connection
+   ```
+
+### PC Agent vs Backend Server Location
+
+**Scenario 1: Both on same machine (Development)**
+```env
+BACKEND_URL=http://localhost:3000
+```
+
+**Scenario 2: Backend on remote server (Production)**
+```env
+# Backend at cloud server with IP 194.195.87.213
+BACKEND_URL=http://194.195.87.213:3000
+
+# OR backend at domain
+BACKEND_URL=https://api.your-domain.com
+```
+
+**Key Point:** PC Agent initiates connection TO backend. Use the correct URL where YOUR backend is actually running!
 
 ## Logs
 
