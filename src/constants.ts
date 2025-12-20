@@ -9,11 +9,9 @@
  * Default configuration values
  */
 export const DEFAULT_CONFIG = {
-  PORT: 3001,
   PRINTER_IP: '192.168.1.100',
   PRINTER_PORT: 9100,
   CONNECTION_TIMEOUT: 5000, // 5 seconds
-  HTTP_TIMEOUT: 15000, // 15 seconds
 } as const;
 
 /**

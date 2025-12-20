@@ -24,7 +24,8 @@ interface ValidationResult {
   errors: string[];
   warnings: string[];
   config: {
-    port: number;
+    backendUrl: string;
+    tenantId: string;
     printerIp: string;
     printerPort: number;
     maxConnections: number;
@@ -39,18 +40,29 @@ function validateConfig(): ValidationResult {
   const warnings: string[] = [];
   let valid = true;
 
-  // Validate PORT
-  const port = parseInt(process.env.PORT || '3001', 10);
-  if (isNaN(port) || port < 1 || port > 65535) {
-    errors.push(`Invalid PORT: ${process.env.PORT}. Must be between 1 and 65535.`);
+  // Validate BACKEND_URL (required)
+  const backendUrl = process.env.BACKEND_URL || '';
+  if (!backendUrl) {
+    errors.push('BACKEND_URL is required but not set in .env file');
+    valid = false;
+  } else {
+    if (!backendUrl.match(/^https?:\/\/.+/)) {
+      errors.push(`Invalid BACKEND_URL format: ${backendUrl}. Must be a valid URL (http:// or https://)`);
+      valid = false;
+    }
+  }
+
+  // Validate TENANT_ID (required)
+  const tenantId = process.env.TENANT_ID || '';
+  if (!tenantId) {
+    errors.push('TENANT_ID is required but not set in .env file');
     valid = false;
   }
 
-  // Validate PRINTER_IP (required)
+  // Validate PRINTER_IP (optional, but warn if not set)
   const printerIp = process.env.PRINTER_IP || '';
   if (!printerIp) {
-    errors.push('PRINTER_IP is required but not set in .env file');
-    valid = false;
+    warnings.push('PRINTER_IP is not set. Using default: 192.168.1.100');
   } else {
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
     if (!ipRegex.test(printerIp)) {
@@ -103,7 +115,8 @@ function validateConfig(): ValidationResult {
     errors,
     warnings,
     config: {
-      port,
+      backendUrl: backendUrl || 'NOT SET',
+      tenantId: tenantId || 'NOT SET',
       printerIp: printerIp || 'NOT SET',
       printerPort,
       maxConnections: isNaN(maxConnections) ? 5 : maxConnections,
@@ -139,7 +152,8 @@ function main() {
 
   console.log('✅ Configuration is valid!\n');
   console.log('📋 Configuration Summary:');
-  console.log(`   Port: ${result.config.port}`);
+  console.log(`   Backend URL: ${result.config.backendUrl}`);
+  console.log(`   Tenant ID: ${result.config.tenantId}`);
   console.log(`   Printer IP: ${result.config.printerIp}`);
   console.log(`   Printer Port: ${result.config.printerPort}`);
   console.log(`   Max Connections: ${result.config.maxConnections}`);

@@ -38,21 +38,7 @@ export interface HealthCheckResponse {
   version: string;
 }
 
-/**
- * WebSocket message types
- */
-export interface WebSocketPrintMessage {
-  type: 'print';
-  data: PrintJobRequest;
-}
-
-export interface WebSocketResponse {
-  type: 'connected' | 'success' | 'error';
-  message: string;
-  printerIp?: string;
-  printerPort?: number;
-  timestamp?: string;
-}
+// WebSocket types removed - using Socket.IO client instead
 
 /**
  * Error codes for consistent error handling

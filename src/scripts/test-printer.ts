@@ -136,7 +136,7 @@ async function main() {
     console.log('');
     console.log('Next steps:');
     console.log('   1. Start the PC Agent: npm start');
-    console.log('   2. Check status: npm run check-status');
+    console.log('   2. Check configuration: npm run cli (option 4)');
     console.log('   3. Configure in Waiter Admin Panel');
     process.exit(0);
   } else {

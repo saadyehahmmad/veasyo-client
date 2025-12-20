@@ -102,9 +102,9 @@ function main() {
     console.log('🎉 PC Agent is now running as a Windows service!');
     console.log('');
     console.log('Next steps:');
-    console.log('   1. Check service status: npm run check-status');
+    console.log('   1. Check configuration: npm run cli (option 4)');
     console.log('   2. View service in Windows Services (services.msc)');
-    console.log('   3. Configure in Waiter Admin Panel');
+    console.log('   3. Check logs: logs/pc-agent.log');
     console.log('');
     console.log('Service Management:');
     console.log('   - Stop: Open Services, find "WaiterPCAgent", right-click > Stop');

@@ -14,7 +14,8 @@ export interface AgentState {
   startTime: Date;
   version: string;
   configuration: {
-    port: number;
+    backendUrl: string;
+    tenantId: string;
     defaultPrinterIp: string;
     defaultPrinterPort: number;
     maxConnectionsPerPrinter: number;
@@ -75,7 +76,8 @@ export class StateService extends EventEmitter {
       startTime: this.startTime,
       version: '1.0.0',
       configuration: {
-        port: parseInt(process.env.PORT || '3001', 10),
+        backendUrl: process.env.BACKEND_URL || 'Not configured',
+        tenantId: process.env.TENANT_ID || 'Not configured',
         defaultPrinterIp: process.env.PRINTER_IP || '192.168.1.100',
         defaultPrinterPort: parseInt(process.env.PRINTER_PORT || '9100', 10),
         maxConnectionsPerPrinter: parseInt(process.env.MAX_PRINTER_CONNECTIONS || '5', 10),
