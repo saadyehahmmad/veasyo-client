@@ -4,7 +4,23 @@ A standalone Node.js bridge service that connects the Waiter cloud/web applicati
 
 ## 🚀 Quick Start
 
-**Run the interactive CLI wizard:**
+**Option 1: Run interactively (recommended for testing)**
+```bash
+npm install
+npm run build
+npm start
+```
+
+**Option 2: Run in background (for production)**
+```bash
+npm install
+npm run build
+npm run start:bg     # Start in background
+npm run status       # Check if running
+npm run stop         # Stop the agent
+```
+
+**Option 3: Use the interactive CLI wizard:**
 ```bash
 npm install
 npm run cli
@@ -45,6 +61,7 @@ LAN Printer (ESC/POS) - Private IP: 192.168.x.x
 
 ## Features
 
+- ✅ **Simple Background Mode**: Run as a background process without Windows service
 - ✅ **Interactive CLI**: Complete setup and management tool
 - ✅ **Automatic Connection**: Connects to backend via Socket.IO (no port forwarding)
 - ✅ **Connection Pooling**: Efficient printer connection management
@@ -199,14 +216,49 @@ npm run cli
 # Select option 1: Complete Setup
 ```
 
+### Running the Agent
+
+**Option 1: Foreground (for testing/debugging)**
+```bash
+npm start
+# Press Ctrl+C to stop
+```
+
+**Option 2: Background Process (recommended for production)**
+```bash
+# Start in background
+npm run start:bg
+
+# Check status
+npm run status
+
+# Stop the agent
+npm run stop
+```
+
+**Option 3: Windows Service (auto-start on boot)**
+```bash
+# Install as service (requires Administrator)
+npm run cli  # Select option 4
+# Or use PowerShell script:
+# .\install-service-admin.ps1
+
+# Manage via Windows Services (services.msc)
+```
+
 ### Daily Operations
 
 ```bash
 # Check status
-npm run cli  # Select option 6
+npm run status
+# Or: npm run cli (Select option 6)
 
-# Start manually (if not installed as service)
-npm start
+# View logs
+cat logs/pc-agent.log
+
+# Restart background process
+npm run stop
+npm run start:bg
 ```
 
 ### Service Management
@@ -214,9 +266,15 @@ npm start
 ```bash
 # Install service (requires admin)
 npm run cli  # Select option 4
+# Or: .\install-service-admin.ps1
 
 # Uninstall service (requires admin)
 npm run cli  # Select option 5
+# Or: .\uninstall-service-admin.ps1
+
+# Check service in Windows
+# Run: services.msc
+# Look for "WaiterPCAgent"
 ```
 
 ## Troubleshooting

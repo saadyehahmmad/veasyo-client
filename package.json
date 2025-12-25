@@ -9,6 +9,9 @@
     "dev": "ts-node src/index.ts",
     "cli": "ts-node src/cli/index.ts",
     "diagnose": "ts-node src/scripts/diagnose.ts",
+    "start:bg": "powershell -ExecutionPolicy Bypass -File ./start-background.ps1",
+    "stop": "powershell -ExecutionPolicy Bypass -File ./stop-agent.ps1",
+    "status": "powershell -ExecutionPolicy Bypass -File ./status-agent.ps1",
     "install-service": "npm run build && node dist/scripts/install-service.js",
     "uninstall-service": "npm run build && node dist/scripts/uninstall-service.js"
   },

@@ -13,10 +13,19 @@ import fs from 'fs';
 // Check if running as administrator
 function checkAdmin(): boolean {
   try {
-    fs.accessSync('C:\\Windows\\System32\\config\\system', fs.constants.R_OK);
+    // On Windows, check if we have admin rights by trying to write to a system directory
+    const testPath = path.join(process.env.WINDIR || 'C:\\Windows', 'Temp', `admin-test-${Date.now()}.tmp`);
+    fs.writeFileSync(testPath, 'test');
+    fs.unlinkSync(testPath);
     return true;
   } catch {
-    return false;
+    // Alternative check: try accessing System32 config
+    try {
+      fs.accessSync('C:\\Windows\\System32\\config\\system', fs.constants.R_OK);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 
@@ -61,13 +70,21 @@ function main() {
   service.on('error', (error: Error) => {
     console.error('❌ Service uninstallation error:');
     console.error(`   ${error.message}`);
+    if (error.stack) {
+      console.error('\nStack trace:');
+      console.error(error.stack);
+    }
     console.error('');
     console.error('Common issues:');
     console.error('   - Service is not installed');
     console.error('   - Service name mismatch');
-    console.error('   - Insufficient permissions (run as Administrator)');
+    console.error('   - Insufficient permissions (run PowerShell as Administrator)');
+    console.error('   - Service is currently running (stop it first in services.msc)');
     console.error('');
-    console.error('You can check if the service exists in Windows Services (services.msc)');
+    console.error('You can check if the service exists in Windows Services:');
+    console.error('   1. Press Win+R');
+    console.error('   2. Type: services.msc');
+    console.error('   3. Look for "WaiterPCAgent"');
     process.exit(1);
   });
 

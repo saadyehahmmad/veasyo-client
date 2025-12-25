@@ -13,11 +13,19 @@ import fs from 'fs';
 // Check if running as administrator
 function checkAdmin(): boolean {
   try {
-    // Try to access a system directory that requires admin rights
-    fs.accessSync('C:\\Windows\\System32\\config\\system', fs.constants.R_OK);
+    // On Windows, check if we have admin rights by trying to write to a system directory
+    const testPath = path.join(process.env.WINDIR || 'C:\\Windows', 'Temp', `admin-test-${Date.now()}.tmp`);
+    fs.writeFileSync(testPath, 'test');
+    fs.unlinkSync(testPath);
     return true;
   } catch {
-    return false;
+    // Alternative check: try accessing System32 config
+    try {
+      fs.accessSync('C:\\Windows\\System32\\config\\system', fs.constants.R_OK);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 
@@ -87,6 +95,10 @@ function main() {
     description: serviceDescription,
     script: scriptPath,
     nodeOptions: [],
+    env: {
+      name: 'NODE_ENV',
+      value: process.env.NODE_ENV || 'production'
+    }
   });
 
   // Install service
@@ -116,11 +128,21 @@ function main() {
   service.on('error', (error: Error) => {
     console.error('❌ Service installation error:');
     console.error(`   ${error.message}`);
+    if (error.stack) {
+      console.error('\nStack trace:');
+      console.error(error.stack);
+    }
     console.error('');
     console.error('Common issues:');
-    console.error('   - Service name already exists (try uninstalling first)');
-    console.error('   - Insufficient permissions (run as Administrator)');
+    console.error('   - Service name already exists (try: npm run uninstall-service first)');
+    console.error('   - Insufficient permissions (run PowerShell as Administrator)');
     console.error('   - Node.js not in PATH');
+    console.error('   - Missing dependencies (try: npm install)');
+    console.error('');
+    console.error('To check if service exists:');
+    console.error('   1. Press Win+R');
+    console.error('   2. Type: services.msc');
+    console.error('   3. Look for "WaiterPCAgent"');
     console.error('');
     process.exit(1);
   });
