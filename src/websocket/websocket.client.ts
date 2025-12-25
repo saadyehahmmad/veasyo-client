@@ -63,10 +63,7 @@ export class PcAgentClient {
       this.socket = io(`${baseUrl}/pc-agent`, {
         path: socketPath,
         transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionDelay: this.reconnectDelay,
-        reconnectionDelayMax: 30000, // Max 30 seconds
-        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnection: false, // Disable auto-reconnection, use custom logic instead
         timeout: 20000,
         auth: {
           tenantId: this.tenantId,
