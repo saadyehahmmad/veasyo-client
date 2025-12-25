@@ -18,87 +18,92 @@ const TENANT_ID = process.env.TENANT_ID || '';
 const PRINTER_IP = process.env.PRINTER_IP || '';
 const PRINTER_PORT = parseInt(process.env.PRINTER_PORT || '9100', 10);
 
-console.log('\n╔══════════════════════════════════════════════════════════╗');
-console.log('║       🔍 PC Agent Connection Diagnostics               ║');
-console.log('╚══════════════════════════════════════════════════════════╝\n');
+async function runDiagnostics() {
+  console.log('\n╔══════════════════════════════════════════════════════════╗');
+  console.log('║       🔍 PC Agent Connection Diagnostics               ║');
+  console.log('╚══════════════════════════════════════════════════════════╝\n');``
 
-// Check .env file
-console.log('📋 Configuration Check:');
-console.log('─'.repeat(60));
-if (!TENANT_ID) {
-  console.log('❌ TENANT_ID is not configured');
-} else {
-  console.log(`✅ TENANT_ID: ${TENANT_ID}`);
-}
-
-console.log(`📡 BACKEND_URL: ${BACKEND_URL}`);
-if (BACKEND_URL === 'http://localhost:3000') {
-  console.log('⚠️  Using localhost - ensure backend is running locally!');
-}
-
-console.log(`🖨️  PRINTER_IP: ${PRINTER_IP}:${PRINTER_PORT}`);
-if (!PRINTER_IP || PRINTER_IP === '192.168.1.100') {
-  console.log('⚠️  Printer IP not configured or using default');
-}
-console.log('');
-
-// Test backend connectivity
-console.log('🔌 Backend Connectivity Test:');
-console.log('─'.repeat(60));
-
-// Parse backend URL
-let backendHost: string;
-let backendPort: number;
-let isHttps = false;
-
-try {
-  const url = new URL(BACKEND_URL);
-  backendHost = url.hostname;
-  backendPort = parseInt(url.port) || (url.protocol === 'https:' ? 443 : 80);
-  isHttps = url.protocol === 'https:';
-  
-  console.log(`Testing connection to: ${backendHost}:${backendPort}`);
-  
-  // Test TCP connection
-  await testTcpConnection(backendHost, backendPort);
-  
-  // Test HTTP/HTTPS endpoint
-  await testHttpEndpoint(BACKEND_URL);
-  
-} catch (error: any) {
-  console.log(`❌ Invalid BACKEND_URL format: ${error.message}`);
-}
-
-console.log('');
-
-// Test printer connectivity
-if (PRINTER_IP && PRINTER_IP !== '192.168.1.100') {
-  console.log('🖨️  Printer Connectivity Test:');
+  // Check .env file
+  console.log('📋 Configuration Check:');
   console.log('─'.repeat(60));
-  console.log(`Testing connection to printer: ${PRINTER_IP}:${PRINTER_PORT}`);
-  await testPrinterConnection(PRINTER_IP, PRINTER_PORT);
+  if (!TENANT_ID) {
+    console.log('❌ TENANT_ID is not configured');
+  } else {
+    console.log(`✅ TENANT_ID: ${TENANT_ID}`);
+  }
+
+  console.log(`📡 BACKEND_URL: ${BACKEND_URL}`);
+  if (BACKEND_URL === 'http://localhost:3000') {
+    console.log('⚠️  Using localhost - ensure backend is running locally!');
+  }
+
+  console.log(`🖨️  PRINTER_IP: ${PRINTER_IP}:${PRINTER_PORT}`);
+  if (!PRINTER_IP || PRINTER_IP === '192.168.1.100') {
+    console.log('⚠️  Printer IP not configured or using default');
+  }
   console.log('');
+
+  // Test backend connectivity
+  console.log('🔌 Backend Connectivity Test:');
+  console.log('─'.repeat(60));
+
+  // Parse backend URL
+  let backendHost: string;
+  let backendPort: number;
+  let isHttps = false;
+
+  try {
+    const url = new URL(BACKEND_URL);
+    backendHost = url.hostname;
+    backendPort = parseInt(url.port) || (url.protocol === 'https:' ? 443 : 80);
+    isHttps = url.protocol === 'https:';
+    
+    console.log(`Testing connection to: ${backendHost}:${backendPort}`);
+    
+    // Test TCP connection
+    await testTcpConnection(backendHost, backendPort);
+    
+    // Test HTTP/HTTPS endpoint
+    await testHttpEndpoint(BACKEND_URL);
+    
+  } catch (error: any) {
+    console.log(`❌ Invalid BACKEND_URL format: ${error.message}`);
+  }
+
+  console.log('');
+
+  // Test printer connectivity
+  if (PRINTER_IP && PRINTER_IP !== '192.168.1.100') {
+    console.log('🖨️  Printer Connectivity Test:');
+    console.log('─'.repeat(60));
+    console.log(`Testing connection to printer: ${PRINTER_IP}:${PRINTER_PORT}`);
+    await testPrinterConnection(PRINTER_IP, PRINTER_PORT);
+    console.log('');
+  }
+
+  // Summary
+  console.log('📝 Summary & Recommendations:');
+  console.log('─'.repeat(60));
+
+  if (!TENANT_ID) {
+    console.log('❌ Configure TENANT_ID in .env file');
+    console.log('   Run: npm run cli (option 1)');
+  }
+
+  if (BACKEND_URL === 'http://localhost:3000') {
+    console.log('⚠️  If backend is on remote server, update BACKEND_URL');
+    console.log('   Example: BACKEND_URL=http://194.195.87.213:3000');
+  }
+
+  console.log('\n💡 Next Steps:');
+  console.log('   1. Fix any ❌ errors shown above');
+  console.log('   2. Update .env file with correct values');
+  console.log('   3. Run: npm run cli (option 1) for guided setup');
+  console.log('   4. Start PC Agent: npm start\n');
 }
 
-// Summary
-console.log('📝 Summary & Recommendations:');
-console.log('─'.repeat(60));
-
-if (!TENANT_ID) {
-  console.log('❌ Configure TENANT_ID in .env file');
-  console.log('   Run: npm run cli (option 1)');
-}
-
-if (BACKEND_URL === 'http://localhost:3000') {
-  console.log('⚠️  If backend is on remote server, update BACKEND_URL');
-  console.log('   Example: BACKEND_URL=http://194.195.87.213:3000');
-}
-
-console.log('\n💡 Next Steps:');
-console.log('   1. Fix any ❌ errors shown above');
-console.log('   2. Update .env file with correct values');
-console.log('   3. Run: npm run cli (option 1) for guided setup');
-console.log('   4. Start PC Agent: npm start\n');
+// Run diagnostics
+runDiagnostics().catch(console.error);
 
 // Helper Functions
 

@@ -26,16 +26,42 @@ export class PcAgentClient {
   }
 
   /**
+   * Parse backend URL to extract base URL and path
+   */
+  private parseBackendUrl(): { baseUrl: string; path: string } {
+    try {
+      const url = new URL(this.backendUrl);
+      const path = url.pathname.endsWith('/') ? url.pathname.slice(0, -1) : url.pathname;
+      const baseUrl = `${url.protocol}//${url.host}`;
+      return {
+        baseUrl,
+        path: path || '',
+      };
+    } catch (error) {
+      // Fallback for invalid URLs
+      return {
+        baseUrl: this.backendUrl,
+        path: '',
+      };
+    }
+  }
+
+  /**
    * Connect to backend Socket.IO server
    */
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      logger.info(`Connecting to backend at ${this.backendUrl}/pc-agent`, {
+      const { baseUrl, path } = this.parseBackendUrl();
+      const socketPath = path ? `${path}/socket.io` : '/socket.io';
+      
+      logger.info(`Connecting to backend at ${baseUrl}${path}/pc-agent`, {
         tenantId: this.tenantId,
+        socketPath,
       });
 
       // Connect to PC Agent namespace
-      this.socket = io(`${this.backendUrl}/pc-agent`, {
+      this.socket = io(`${baseUrl}/pc-agent`, {
+        path: socketPath,
         transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionDelay: this.reconnectDelay,
